@@ -135,9 +135,9 @@ func (e *Endpoint) ActiveApp() (*App, error) {
 }
 
 // ActiveMediaPlayer returns the currently active media player for an Endpoint.
-func (e *Endpoint) ActiveMediaPlayer() (*App, error) {
-	apps := apps{}
-
+func (e *Endpoint) ActiveMediaPlayer() (*Player, error) {
+	Player := &Player{}
+	fmt.Println(e.url + pathToQueryActiveMediaPlayer)
 	resp, err := http.Get(e.url + pathToQueryActiveMediaPlayer)
 	if err != nil {
 		return nil, err
@@ -150,17 +150,17 @@ func (e *Endpoint) ActiveMediaPlayer() (*App, error) {
 
 	decoder := xml.NewDecoder(resp.Body)
 
-	err = decoder.Decode(&apps)
+	err = decoder.Decode(&Player)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s", "NOPE")
 	}
 
-	if len(apps.All) == 0 {
-		return nil, ErrNoAppFound
-	}
+	// if len(Player.All) == 0 {
+	// 	return nil, fmt.Errorf("%s", "FAILED!")
+	// }
 
-	return apps.All[0], nil
+	return Player, nil
 }
 
 // FindRemote is a short-cut to the Keypress to find a roku remote control.
