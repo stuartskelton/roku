@@ -1,3 +1,5 @@
+this is a provate fork, use at your own risk, I will not be maintaing this
+
 # roku
 > Roku External Control API package for Golang
 
