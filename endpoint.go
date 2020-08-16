@@ -40,17 +40,18 @@ var (
 	// ErrAppNotFound is the error returned when the target app. was not found.
 	ErrAppNotFound = errors.New("Failed to find app")
 
-	pathToQueryActiveApp     = "/query/active-app"
-	pathToQueryAvailableApps = "/query/apps"
-	pathToQueryIcon          = "/query/icon/"
-	pathToQueryDeviceInfo    = "/query/device-info"
-	pathToKeypress           = "/keypress/"
-	pathToKeyUp              = "/keyup/"
-	pathToKeyDown            = "/keyup/"
-	pathToLaunch             = "/launch/"
-	pathToInstall            = "/install/"
-	pathToSearch             = "/search/browse"
-	pathToInput              = "/input"
+	pathToQueryActiveApp         = "/query/active-app"
+	pathToQueryActiveMediaPlayer = "/query/media-player"
+	pathToQueryAvailableApps     = "/query/apps"
+	pathToQueryIcon              = "/query/icon/"
+	pathToQueryDeviceInfo        = "/query/device-info"
+	pathToKeypress               = "/keypress/"
+	pathToKeyUp                  = "/keyup/"
+	pathToKeyDown                = "/keyup/"
+	pathToLaunch                 = "/launch/"
+	pathToInstall                = "/install/"
+	pathToSearch                 = "/search/browse"
+	pathToInput                  = "/input"
 )
 
 // IsInstalledApp checks if the device has a given application ID
@@ -109,6 +110,35 @@ func (e *Endpoint) ActiveApp() (*App, error) {
 	apps := apps{}
 
 	resp, err := http.Get(e.url + pathToQueryActiveApp)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.Body == nil {
+		return nil, ErrNoRespBody
+	}
+
+	decoder := xml.NewDecoder(resp.Body)
+
+	err = decoder.Decode(&apps)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(apps.All) == 0 {
+		return nil, ErrNoAppFound
+	}
+
+	return apps.All[0], nil
+}
+
+// ActiveMediaPlayer returns the currently active media player for an Endpoint.
+func (e *Endpoint) ActiveMediaPlayer() (*App, error) {
+	apps := apps{}
+
+	resp, err := http.Get(e.url + pathToQueryActiveMediaPlayer)
 	if err != nil {
 		return nil, err
 	}
